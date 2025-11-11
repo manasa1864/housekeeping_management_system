@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Maintenance — Tasks & Resources</title>
+<style>
+  :root{--bg:#0b1116;--side:#0e141a;--panel:#111922;--line:rgba(255,255,255,.08);--ink:#e9f1f8}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui}
+  .shell{display:grid;grid-template-columns:240px 1fr;min-height:100%}
+  .side{background:#0e141a;border-right:1px solid var(--line);padding:18px}
+  .brand{font-weight:800;margin:6px 4px 14px}
+  .nav a{display:block;color:#dfe7f1;text-decoration:none;padding:10px 12px;border-radius:10px}
+  .nav a.active,.nav a:hover{background:rgba(255,255,255,.08)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h1{margin:0 0 12px}
+  .card{background:#111922;border:1px solid var(--line);border-radius:16px;padding:12px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+  .search{background:#0f1720;color:#e9f1f8;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .table-wrap{overflow:auto}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:0;background:#0f1a24;padding:12px;text-align:left}
+  td{padding:12px;border-bottom:1px solid var(--line)}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .pill.over{background:#ffd7d7;color:#7f1e1e}
+  .pill.wait{background:#d6e7ff;color:#1f4e98}
+  .pill.done{background:#cfeecf;color:#145d2a}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Housekeeping</div>
+    <nav class="nav">
+      <a href="floor-cleaning.html">Floor Cleaning</a>
+      <a href="room-cleaning.html">Room Cleaning</a>
+      <a href="laundry.html">Laundry</a>
+      <a href="food-service.html">Food Service</a>
+      <a href="maintenance.html" class="active">Maintenance</a>
+      <a href="gardener.html">Gardener</a>
+      <a href="storekeeping.html">Storekeeping</a>
+      <a href="night-shift.html">Night Shift</a>
+    </nav>
+  </aside>
+
+  <main>
+    <h1 id="deptTitle">Maintenance — Tasks & Resources</h1>
+
+    <!-- Tasks -->
+    <div class="card">
+      <div class="filters">
+        <select id="filterStatus" class="search">
+          <option>All</option><option>Pending</option><option>In Progress</option><option>Completed</option>
+        </select>
+        <select id="filterAssignee" class="search"><option>All</option></select>
+        <select id="filterType" class="search"><option>All Types</option></select>
+        <input id="filterSearch" class="search" placeholder="Search by title/assignee/room/type"/>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:48px;color:#9bb0c9">#</th>
+              <th>Title</th>
+              <th>Assignee</th>
+              <th>Room/Area</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th style="width:220px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tasksTbody"></tbody>
+        </table>
+        <div id="tasksEmpty" style="display:none;color:#9bb0c9;padding:14px">No tasks yet for this department.</div>
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <div class="card" style="margin-top:12px">
+      <div class="filters" style="margin-top:0">
+        <select id="resFilterStatus" class="search">
+          <option>All</option><option>Requested</option><option>Approved</option><option>Issued</option>
+        </select>
+        <input id="resFilterSearch" class="search" placeholder="Search item/assignee…">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:48px;color:#9bb0c9">#</th>
+              <th>Item</th>
+              <th>Assignee</th>
+              <th>Qty</th>
+              <th>Needed On</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="resTbody"></tbody>
+        </table>
+        <div id="resEmpty" style="display:none;color:#9bb0c9;padding:14px">No resources for this department.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="maintenance.js"></script>
+<script src="staff-roster.js"></script>
+<script src="dept-common.js"></script>
+<script src="dept-sync.js" defer></script>
+<script>
+  // dept-common renders tasks/resources; we just set dept + optional roster
+  initDeptPage('Maintenance');
+
+  // Optional: if later you add a roster UI + renderer, this wires staff into it.
+  if (typeof DeptSync?.use === "function") {
+    DeptSync.use('Maintenance', ({tasks, staff}) => {
+      if (typeof renderStaffRoster === "function") {
+        renderStaffRoster(staff);
+      }
+    });
+  }
+</script>
+<script src="logout.js"></script>
+</body>
+</html>

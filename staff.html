@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Staff — Housekeeping</title>
+<style>
+  :root{--bg:#0b1116;--side:#0e141a;--panel:#111922;--line:rgba(255,255,255,.08);--ink:#e9f1f8;--mut:#9fb0c7;--brand:#2b74ff;--brand2:#1a59e6}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui}
+  .shell{display:grid;grid-template-columns:240px 1fr;min-height:100%}
+  .side{background:#0e141a;border-right:1px solid var(--line);padding:18px}
+  .brand{font-weight:800;margin:6px 4px 14px}
+  .nav a{display:block;color:#dfe7f1;text-decoration:none;padding:10px 12px;border-radius:10px}
+  .nav a.active,.nav a:hover{background:rgba(255,255,255,.08)}
+  main{padding:24px;max-width:1400px;margin:0 auto}
+  h1{margin:0 0 12px}
+  .top{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .search{flex:1;max-width:560px;background:#0f1720;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .btn{border:0;border-radius:10px;padding:10px 12px;font-weight:800;color:#fff;background:linear-gradient(180deg,var(--brand),var(--brand2));cursor:pointer}
+  .btn.ghost{background:#0f1720;color:#dfe7f1;border:1px solid var(--line)}
+  .card{background:#111922;border:1px solid var(--line);border-radius:16px;padding:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .table-wrap{overflow:auto}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:0;background:#0f1a24;padding:12px;text-align:left}
+  td{padding:12px;border-bottom:1px solid var(--line)}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.12)}
+  .pill.done{background:#cfeecf;color:#145d2a}
+  .pill.over{background:#ffd7d7;color:#7f1e1e}
+  .kpis{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .kpi{padding:12px;border-radius:12px;border:1px solid var(--line);background:#0f1720}
+  .kpi .v{font-size:22px;font-weight:900}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  .dept-card{padding:14px;border-radius:14px;border:1px solid var(--line);background:#0f1720;text-decoration:none;color:var(--ink)}
+  .dept-card h3{margin:0 0 6px;font-size:16px}
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center}
+  .modal-card{width:560px;background:#0f1722;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .modal-grid{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+  .input,.select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0f1720;color:var(--ink)}
+  /* Toast */
+  .toast{position:fixed;right:16px;bottom:16px;background:#0b1324;border:1px solid var(--line);padding:10px 12px;border-radius:12px;opacity:0;transform:translateY(6px);transition:.18s}
+  .toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Housekeeping</div>
+  </aside>
+
+  <main>
+    <h1>Staff Management</h1>
+
+    <div class="top">
+      <input id="searchInput" class="search" type="search" placeholder="Search name / role / type…"/>
+      <div class="row">
+        <select id="typeFilter" class="search" style="max-width:220px">
+          <option value="">All Types</option>
+          <option>Room Cleaning</option><option>Floor Cleaning</option><option>Laundry</option>
+          <option>Food Service</option><option>Maintenance</option><option>Public Area</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+        <select id="statusFilter" class="search" style="max-width:200px">
+          <option value="">Any Status</option><option>Active</option><option>Inactive</option>
+        </select>
+        <select id="goDept" class="search" style="max-width:240px">
+          <option value="">Go to department page…</option>
+          <option value="floor-cleaning.html">Floor Cleaning</option>
+          <option value="room-cleaning.html">Room Cleaning</option>
+          <option value="laundry.html">Laundry</option>
+          <option value="food-service.html">Food Service</option>
+          <option value="maintenance.html">Maintenance</option>
+          <option value="gardener.html">Gardener</option>
+          <option value="storekeeping.html">Storekeeping</option>
+          <option value="night-shift.html">Night Shift</option>
+        </select>
+        <button id="addStaffBtn" class="btn">+ Add Staff</button>
+      </div>
+    </div>
+
+    <section class="kpis">
+      <div class="kpi"><div style="color:#9fb0c7">Total Staff</div><div id="k_total" class="v">0</div></div>
+      <div class="kpi"><div style="color:#9fb0c7">Active</div><div id="k_active" class="v">0</div></div>
+      <div class="kpi"><div style="color:#9fb0c7">Inactive</div><div id="k_inactive" class="v">0</div></div>
+      <div class="kpi"><div style="color:#9fb0c7">Assigned Sum</div><div id="k_assigned" class="v">0</div></div>
+    </section>
+
+    <section class="card" style="margin-top:12px">
+      <div class="table-wrap">
+        <table aria-label="Staff list">
+          <tbody id="staffTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:12px">
+      <div style="font-weight:800;margin-bottom:6px">Departments</div>
+      <div class="grid" id="deptGrid"><!-- injected --></div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="m_title">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 id="m_title" style="margin:0">Add Staff</h3>
+      <button id="m_close" class="btn ghost" style="padding:6px 10px">✕</button>
+    </div>
+    <div class="modal-grid">
+      <label>Name<input id="m_name" class="input" placeholder="Jane Doe"/></label>
+      <label>Role<input id="m_role" class="input" placeholder="Housekeeper"/></label>
+      <label>Type
+        <select id="m_type" class="select">
+          <option>Room Cleaning</option><option>Floor Cleaning</option><option>Laundry</option>
+          <option>Food Service</option><option>Maintenance</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+      </label>
+      <label>Status
+        <select id="m_status" class="select"><option>Active</option><option>Inactive</option></select>
+      </label>
+      <label style="grid-column:1/-1">Assigned<input id="m_assigned" class="input" type="number" min="0" value="0"/></label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="m_cancel" class="btn ghost">Cancel</button>
+      <button id="m_save" class="btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ========= Keys (aligned with Admin/Manager) ========= */
+const KEYS = { STAFF:'hms_staff_local_v1', STAFF_PING:'staff-updated' };
+const $=(s,p=document)=>p.querySelector(s);
+const $$=(s,p=document)=>[...p.querySelectorAll(s)];
+const uid=()=>crypto?.randomUUID?.()||('id_'+Math.random().toString(36).slice(2));
+const toast=m=>{const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1300);};
+const normType=v=>({ 'room cleaning':'Room Cleaning','floor cleaning':'Floor Cleaning','laundry':'Laundry','food service':'Food Service','maintenance':'Maintenance','gardener':'Gardener','storekeeping':'Storekeeping','night shift':'Night Shift'})[String(v||'').toLowerCase().trim()]||v||'Room Cleaning';
+
+function loadStaff(){ try{const a=JSON.parse(localStorage.getItem(KEYS.STAFF)||'[]'); return Array.isArray(a)?a:[];}catch{return[]} }
+function saveStaff(arr){ localStorage.setItem(KEYS.STAFF, JSON.stringify(arr||[])); localStorage.setItem(KEYS.STAFF_PING, String(Date.now())); try{window.dispatchEvent(new Event(KEYS.STAFF_PING));}catch{} }
+
+const app={ staff:[], editId:null };
+
+function kpis(){
+  $("#k_total").textContent=app.staff.length;
+  const active=app.staff.filter(s=>s.status==='Active').length;
+  $("#k_active").textContent=active;
+  $("#k_inactive").textContent=app.staff.length-active;
+  $("#k_assigned").textContent=app.staff.reduce((a,s)=>a+(+s.assigned||0),0);
+}
+
+function deptLinkFor(type){
+  const t=normType(type).toLowerCase();
+  if(t==='room cleaning') return 'room-cleaning.html';
+  if(t==='floor cleaning') return 'floor-cleaning.html';
+  if(t==='laundry') return 'laundry.html';
+  if(t==='food service') return 'food-service.html';
+  if(t==='maintenance') return 'maintenance.html';
+  if(t==='gardener') return 'gardener.html';
+  if(t==='storekeeping') return 'storekeeping.html';
+  if(t==='night shift') return 'night-shift.html';
+  return 'admin.html';
+}
+
+function renderDeptCards(){
+  const host=$("#deptGrid"); host.innerHTML='';
+  const DEPTS=['Floor Cleaning','Room Cleaning','Laundry','Food Service','Maintenance','Gardener','Storekeeping','Night Shift'];
+  DEPTS.forEach(d=>{
+    const count=app.staff.filter(s=>s.type===d).length;
+    const a=document.createElement('a');
+    a.className='dept-card';
+    a.href=deptLinkFor(d);
+    a.innerHTML=`<h3>${d}</h3><div style="color:#9fb0c7;font-size:13px">${count} staff</div><div style="margin-top:10px"><span class="btn ghost">Open</span></div>`;
+    host.appendChild(a);
+  });
+}
+
+function renderTable(){
+  const term=($("#searchInput").value||'').toLowerCase().trim();
+  const type=$("#typeFilter").value||'';
+  const st=$("#statusFilter").value||'';
+  const body=$("#staffTbody"); body.innerHTML='';
+  app.staff
+    .filter(s=>!type || s.type===type)
+    .filter(s=>!st || s.status===st)
+    .filter(s=>!term || `${s.name} ${s.role||''} ${s.type||''}`.toLowerCase().includes(term))
+    .forEach(s=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${s.name}</td>
+        <td>${s.role||''}</td>
+        <td>${s.type||''}</td>
+        <td>${s.status==='Active'?'<span class="pill done">Active</span>':'<span class="pill over">Inactive</span>'}</td>
+        <td>${s.assigned||0}</td>
+        <td>
+          <button class="btn" data-edit="${s.id}">Edit</button>
+          <button class="btn ghost" data-del="${s.id}">Remove</button>
+          <a class="btn ghost" href="${deptLinkFor(s.type)}">Open Dept</a>
+        </td>`;
+      body.appendChild(tr);
+    });
+}
+
+function openModal(edit=null){
+  $("#m_title").textContent = edit ? "Edit Staff" : "Add Staff";
+  $("#modal").style.display='flex';
+  if(edit){
+    app.editId=edit.id;
+    $("#m_name").value=edit.name||'';
+    $("#m_role").value=edit.role||'Housekeeper';
+    $("#m_type").value=normType(edit.type||'Room Cleaning');
+    $("#m_status").value=edit.status||'Active';
+    $("#m_assigned").value=edit.assigned||0;
+  }else{
+    app.editId=null;
+    $("#m_name").value=''; $("#m_role").value='Housekeeper';
+    $("#m_type").value='Room Cleaning'; $("#m_status").value='Active'; $("#m_assigned").value='0';
+  }
+}
+function closeModal(){ $("#modal").style.display='none'; }
+
+function addOrUpdate(){
+  const s={
+    id: app.editId || uid(),
+    name: $("#m_name").value.trim(),
+    role: $("#m_role").value.trim()||'Housekeeper',
+    type: normType($("#m_type").value.trim()),
+    status: $("#m_status").value.trim()||'Active',
+    assigned: +($("#m_assigned").value||0)
+  };
+  if(!s.name) return toast('Enter name');
+
+  if(app.editId){
+    const i=app.staff.findIndex(x=>x.id===app.editId);
+    if(i>=0) app.staff[i]=s;
+  }else{
+    app.staff.push(s);
+  }
+  saveStaff(app.staff);
+  kpis(); renderTable(); renderDeptCards();
+  closeModal(); toast('Saved');
+}
+
+function removeStaff(id){
+  const s=app.staff.find(x=>x.id===id);
+  if(!s) return;
+  if(!confirm(`Remove "${s.name}"?`)) return;
+  app.staff=app.staff.filter(x=>x.id!==id);
+  saveStaff(app.staff);
+  kpis(); renderTable(); renderDeptCards();
+  toast('Removed');
+}
+
+/* ===== Wiring ===== */
+document.addEventListener('click', e=>{
+  const b=e.target.closest('button,a'); if(!b) return;
+  if(b.id==='addStaffBtn') return openModal();
+  if(b.id==='m_close'||b.id==='m_cancel') return closeModal();
+  if(b.id==='m_save') return addOrUpdate();
+  if(b.dataset.edit){ const s=app.staff.find(x=>x.id===b.dataset.edit); if(s) openModal(s); }
+  if(b.dataset.del) return removeStaff(b.dataset.del);
+});
+['searchInput','typeFilter','statusFilter'].forEach(id=>document.getElementById(id)?.addEventListener('input', renderTable));
+document.getElementById('goDept')?.addEventListener('change', e=>{ const v=e.target.value; if(v) location.href=v; });
+
+/* Cross-tab sync */
+window.addEventListener('storage', e=>{
+  if(e.key===KEYS.STAFF || e.key===KEYS.STAFF_PING){
+    app.staff=loadStaff(); kpis(); renderTable(); renderDeptCards();
+  }
+});
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', ()=>{
+  app.staff=loadStaff();
+  kpis(); renderTable(); renderDeptCards();
+});
+</script>
+<script src="logout.js"></script>
+</body>
+</html>

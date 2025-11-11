@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Manager — Housekeeping</title>
+<style>
+  :root{--bg:#0b1116;--side:#0e141a;--panel:#111922;--line:rgba(255,255,255,.08);--ink:#e9f1f8;--mut:#a6b2bf;--brand:#2b74ff;--brand2:#1a59e6}
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui}
+  .shell{display:grid;grid-template-columns:240px 1fr;min-height:100%}
+  .side{background:var(--side);border-right:1px solid var(--line);padding:18px}
+  .brand{font-weight:800;margin:6px 4px 14px}
+  .nav a{display:block;color:#dfe7f1;text-decoration:none;padding:10px 12px;border-radius:10px}
+  .nav a.active,.nav a:hover{background:rgba(255,255,255,.08)}
+  main{padding:24px;max-width:1200px;margin:0 auto}
+  .top{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .search{flex:1;max-width:560px;background:#0f1720;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .btn{border:0;border-radius:10px;padding:10px 12px;font-weight:800;color:#fff;background:linear-gradient(180deg,var(--brand),var(--brand2));cursor:pointer}
+  .btn.ghost{background:#0f1720;color:#dfe7f1;border:1px solid var(--line)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px}
+  .list .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.12)}
+  .pill.done{background:#cfeecf;color:#145d2a}
+  .pill.wait{background:#d6e7ff;color:#1f4e98}
+  .pill.over{background:#ffd7d7;color:#7f1e1e}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  .table-wrap{overflow:auto}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:0;background:#0f1a24;padding:12px;text-align:left}
+  td{padding:12px;border-bottom:1px solid var(--line)}
+  .toast{position:fixed;right:16px;bottom:16px;background:#0b1324;border:1px solid var(--line);padding:10px 12px;border-radius:12px;opacity:0;transform:translateY(6px);transition:.18s}
+  .toast.show{opacity:1;transform:translateY(0)}
+  @media(max-width:1100px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Housekeeping</div>
+    <nav class="nav">
+      <a href="admin.html">Dashboard</a>
+      <a href="manager.html" class="active">Manager</a>
+      <a href="floor-cleaning.html">Floor Cleaning</a>
+      <a href="room-cleaning.html">Room Cleaning</a>
+      <a href="laundry.html">Laundry</a>
+      <a href="food-service.html">Food Service</a>
+      <a href="maintenance.html">Maintenance</a>
+      <a href="gardener.html">Gardener</a>
+      <a href="storekeeping.html">Storekeeping</a>
+      <a href="night-shift.html">Night Shift</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="top">
+      <input id="searchTasks" class="search" placeholder="Search tasks…">
+      <div style="display:flex;gap:8px">
+        <button id="btnAddTaskM" class="btn">+ Task</button>
+        <button id="btnAddRes" class="btn ghost">+ Resource</button>
+      </div>
+    </div>
+
+    <section class="grid">
+      <!-- Tasks panel -->
+      <section class="card">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <select id="filterDept" class="search" style="max-width:220px">
+            <option value="">All Departments</option>
+            <option>Floor Cleaning</option><option>Room Cleaning</option><option>Laundry</option>
+            <option>Food Service</option><option>Maintenance</option>
+            <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+          </select>
+          <select id="filterStatusM" class="search" style="max-width:200px"><option>All</option><option>Pending</option><option>In Progress</option><option>Completed</option></select>
+        </div>
+        <div id="mgrTaskList" class="list"></div>
+      </section>
+
+      <!-- Resources panel -->
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-weight:800">Resources</div>
+          <button id="btnAddResTop" class="btn">+ Resource</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+          <select id="resDept" class="search" style="max-width:220px">
+            <option value="">All Departments</option>
+            <option>Floor Cleaning</option><option>Room Cleaning</option><option>Laundry</option>
+            <option>Food Service</option><option>Maintenance</option>
+            <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+          </select>
+          <select id="resStatus" class="search" style="max-width:200px">
+            <option>All</option><option>Requested</option><option>Approved</option><option>Issued</option>
+          </select>
+          <input id="resSearch" class="search" placeholder="Search item/assignee…">
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>#</th><th>Item</th><th>Assignee</th><th>Dept</th><th>Qty</th><th>Needed On</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="resBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<!-- Task Modal -->
+<div id="taskModalM" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center">
+  <div style="width:560px;background:#0f1722;border:1px solid var(--line);border-radius:14px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">Create Task (Manager)</h3>
+      <button id="closeTaskModalM" class="btn ghost" style="padding:6px 10px">✕</button>
+    </div>
+    <div style="display:grid;gap:10px;grid-template-columns:1fr 1fr">
+      <label class="full">Title<input id="m_title" class="search" placeholder="e.g., Lobby — Sweep"></label>
+      <label>Assignee<input id="m_assignee" class="search" placeholder="Name"></label>
+      <label>Department
+        <select id="m_dept" class="search">
+          <option>Floor Cleaning</option><option>Room Cleaning</option><option>Laundry</option>
+          <option>Food Service</option><option>Maintenance</option><option>Public Area</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+      </label>
+      <label>Work Type (category)<input id="m_category" class="search" placeholder="e.g., Floor Polish"></label>
+      <label class="full">Room / Area<input id="m_room" class="search" placeholder="e.g., 102 / Lobby"></label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="cancelM" class="btn ghost">Cancel</button>
+      <button id="saveM" class="btn">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resource Modal -->
+<div id="resModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center">
+  <div style="width:560px;background:#0f1722;border:1px solid var(--line);border-radius:14px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">Add Resource</h3>
+      <button id="closeRes" class="btn ghost" style="padding:6px 10px">✕</button>
+    </div>
+    <div style="display:grid;gap:10px;grid-template-columns:1fr 1fr">
+      <label class="full">Item<input id="r_item" class="search" placeholder="e.g., Mop, Detergent"></label>
+      <label>Assignee<input id="r_assignee" class="search" placeholder="Name (optional)"></label>
+      <label>Department
+        <select id="r_dept" class="search">
+          <option>Floor Cleaning</option><option>Room Cleaning</option><option>Laundry</option>
+          <option>Food Service</option><option>Maintenance</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+      </label>
+      <label>Quantity<input id="r_qty" class="search" type="number" min="1" value="1"></label>
+      <label>Unit<input id="r_unit" class="search" placeholder="pcs, L, kg…"></label>
+      <label>Needed On<input id="r_needed" class="search" type="date"></label>
+      <label class="full">Notes<input id="r_notes" class="search" placeholder="Any details…"></label>
+      <label>Status
+        <select id="r_status" class="search"><option>Requested</option><option>Approved</option><option>Issued</option></select>
+      </label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="cancelRes" class="btn ghost">Cancel</button>
+      <button id="saveRes" class="btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastM" class="toast"></div>
+
+<script src="manager.js" defer></script>
+<script src="logout.js"></script>
+</body>
+</html>

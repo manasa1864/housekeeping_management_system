@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin — Housekeeping</title>
+<style>
+:root{
+  --bg:#0b1116;--side:#0e141a;--panel:#111922;--line:rgba(255,255,255,.08);
+  --ink:#e9f1f8;--mut:#a6b2bf;--brand:#2b74ff;--brand2:#1a59e6
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:14px/1.6 Inter,system-ui;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+
+/* Shell layout */
+.shell{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  min-height:100%;
+  gap:0;
+}
+
+/* Sidebar (sticky, scrollable if needed) */
+.side{
+  position:sticky;
+  top:0;
+  height:100vh;
+  overflow:auto;
+  background:var(--side);
+  border-right:1px solid var(--line);
+  padding:18px;
+}
+.brand{font-weight:800;margin:6px 4px 14px}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav a{
+  display:block;
+  color:#dfe7f1;
+  text-decoration:none;
+  padding:10px 12px;
+  border-radius:10px;
+  transition:background .18s, transform .06s;
+}
+.nav a:hover{background:rgba(255,255,255,.08)}
+.nav a.active{
+  background:linear-gradient(180deg,var(--brand),var(--brand2));
+  color:#fff;
+}
+
+/* Main area */
+main{
+  padding:24px;
+  max-width:1280px;
+  width:100%;
+  margin:0 auto;
+}
+
+/* Top bar */
+.top{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.search{
+  flex:1;
+  min-width:260px;
+  max-width:640px;
+  background:#0f1720;
+  color:var(--ink);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:10px 12px;
+}
+
+/* Buttons */
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(180deg,var(--brand),var(--brand2));
+  cursor:pointer;
+  transition:filter .16s, transform .06s;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:#0f1720;color:#dfe7f1;border:1px solid var(--line)}
+
+/* Cards */
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  box-shadow:0 6px 24px rgba(0,0,0,.35);
+}
+.section-title{font-weight:800;margin:2px 0 10px}
+
+/* Grids */
+.grid-kpi{
+  display:grid;
+  gap:12px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+.grid-main{
+  display:grid;
+  gap:12px;
+  grid-template-columns:1.2fr .8fr;
+  align-items:start;
+}
+.stack{display:grid;gap:12px}
+
+/* Pills & list */
+.list .item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;
+}
+.pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.12)}
+.pill.done{background:#cfeecf;color:#145d2a}
+.pill.wait{background:#d6e7ff;color:#1f4e98}
+.pill.over{background:#ffd7d7;color:#7f1e1e}
+
+/* Tables */
+table{width:100%;border-collapse:collapse}
+.thead-sticky thead th,
+thead th{
+  position:sticky;top:0;background:#0f1a24;color:#eef6ff;padding:12px;text-align:left;
+  z-index:1;
+}
+td{padding:12px;border-bottom:1px solid var(--line)}
+.table-wrap{overflow:auto;max-width:100%}
+
+/* Charts */
+canvas{
+  display:block;
+  width:100% !important;
+  height:300px !important;          /* a bit taller for readability */
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+}
+
+/* Toast */
+.toast{
+  position:fixed;right:16px;bottom:16px;
+  background:#0b1324;border:1px solid var(--line);
+  padding:10px 12px;border-radius:12px;
+  opacity:0;transform:translateY(6px);
+  transition:.18s
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Responsive */
+@media (max-width:1200px){
+  .grid-main{grid-template-columns:1fr}
+}
+@media (max-width:1000px){
+  .grid-kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto}
+  .top{gap:10px}
+  .search{max-width:100%}
+  canvas{height:260px !important}
+}
+
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">Housekeeping</div>
+    <nav class="nav">
+      <a href="admin.html" class="active">Dashboard</a>
+      <a href="room.html">Rooms</a>
+      <a href="manager.html">Manager</a>
+      <a href="staff.html">Staff</a>
+      <a href="reports.html">Reports</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="top">
+      <input id="globalSearch" class="search" placeholder="Search staff, rooms, tasks…">
+      <div style="display:flex;gap:8px">
+        <button id="btnAddStaff" class="btn ghost">+ Staff</button>
+        <button id="btnAddTask" class="btn">+ Task</button>
+      </div>
+    </div>
+
+    <section class="grid-kpi">
+      <div class="card"><div style="color:#a6b2bf">Total Staff</div><div id="k_staff" style="font-size:26px;font-weight:900">0</div></div>
+      <div class="card"><div style="color:#a6b2bf">Total Rooms</div><div id="k_rooms" style="font-size:26px;font-weight:900">0</div></div>
+      <div class="card"><div style="color:#a6b2bf">Pending</div><div id="k_pending" style="font-size:26px;font-weight:900">0</div></div>
+      <div class="card"><div style="color:#a6b2bf">Completed</div><div id="k_done" style="font-size:26px;font-weight:900">0</div></div>
+    </section>
+
+    <section class="grid-main" style="margin-top:12px">
+      <div class="stack">
+        <div class="card">
+          <div class="section-title">Task Completion Trends (Mon–Sun)</div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px">
+            <select id="yearSelect" class="search" style="max-width:160px"></select>
+          </div>
+          <canvas id="taskTrendChart"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Staff and their number of assigned tasks</div>
+          <canvas id="staffBarChart"></canvas>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="section-title">Room Occupancy Status</div>
+          <div class="hint" style="color:#a6b2bf;margin:-4px 0 6px">Reads live from Rooms page</div>
+          <canvas id="roomDonut"></canvas>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="section-title" style="margin:0">Tasks</div>
+            <button id="btnAddTask2" class="btn">+ Task</button>
+          </div>
+          <div id="taskList" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+<!-- Add Staff Modal -->
+<div id="staffModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center">
+  <div style="width:560px;background:#0f1722;border:1px solid var(--line);border-radius:14px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">Add Staff</h3>
+      <button id="closeStaffModal" class="btn ghost" style="padding:6px 10px">✕</button>
+    </div>
+    <div style="display:grid;gap:10px;grid-template-columns:1fr 1fr">
+      <label>Name<input id="st_name" class="search" placeholder="Full name"></label>
+      <label>Role<input id="st_role" class="search" placeholder="Housekeeper"></label>
+      <label>Type
+        <select id="st_type" class="search">
+          <option>Room Cleaning</option><option>Floor Cleaning</option><option>Public Area</option>
+          <option>Laundry</option><option>Food Service</option><option>Maintenance</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+      </label>
+      <label>Status
+        <select id="st_status" class="search"><option>Active</option><option>Inactive</option></select>
+      </label>
+      <label style="grid-column:1/-1">Assigned<input id="st_assigned" type="number" min="0" value="0" class="search"></label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="cancelStaff" class="btn ghost">Cancel</button>
+      <button id="saveStaff" class="btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Task Modal -->
+<div id="taskModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center">
+  <div style="width:560px;background:#0f1722;border:1px solid var(--line);border-radius:14px;padding:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0">Create Task</h3>
+      <button id="closeTaskModal" class="btn ghost" style="padding:6px 10px">✕</button>
+    </div>
+    <div style="display:grid;gap:10px;grid-template-columns:1fr 1fr">
+      <label class="full">Title<input id="tk_title" class="search" placeholder="e.g., Corridor — Scrub & Mop"></label>
+      <label>Assignee
+        <input id="tk_assignee" class="search" placeholder="Type to search…" list="assignees_list" autocomplete="off">
+        <datalist id="assignees_list"></datalist>
+      </label>
+      <label>Department
+        <select id="tk_dept" class="search">
+          <option>Floor Cleaning</option><option>Room Cleaning</option><option>Laundry</option>
+          <option>Food Service</option><option>Maintenance</option><option>Public Area</option>
+          <option>Gardener</option><option>Storekeeping</option><option>Night Shift</option>
+        </select>
+      </label>
+      <label>Work Type (category)
+        <input id="tk_category" class="search" placeholder="e.g., Floor Polish, Scrub & Mop">
+      </label>
+      <label class="full">Room / Area<input id="tk_room" class="search" placeholder="Lobby, 1st Floor, 305"></label>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="cancelTask" class="btn ghost">Cancel</button>
+      <button id="saveTask" class="btn">Create</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="admin.js" defer></script>
+<script src="logout.js"></script>
+</body>
+</html>

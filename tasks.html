@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Task Assignment — Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar sidebar--light">
+    <div class="brand">Housekeeping</div>
+    <nav class="nav">
+      <a href="admin.html" class="nav-link">Dashboard</a>
+      <a href="staff.html" class="nav-link">Staff</a>
+      <a href="rooms.html" class="nav-link">Rooms</a>
+      <a href="tasks.html" class="nav-link active">Tasks</a>
+      <a href="reports.html" class="nav-link">Reports</a>
+      <a href="settings.html" class="nav-link">Settings</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <h2>Task Assignment</h2>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <input id="taskSearch" class="search" placeholder="Search tasks..." style="width:320px;padding:8px 12px"/>
+        <button id="btnAddTask" class="btn">+ New Task</button>
+      </div>
+    </div>
+
+    <section class="stage">
+      <div class="section-head">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <label>Filter:
+            <select id="taskFilter" class="select">
+              <option value="">All</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </label>
+
+          <label>Assignee:
+            <select id="assigneeFilter" class="select">
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label>Type:
+            <select id="typeFilter" class="select">
+              <option value="">All Types</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="muted" style="font-size:13px">Admin only — create & assign tasks</div>
+      </div>
+
+      <div class="card cards" style="margin-top:12px">
+        <div class="table-wrap">
+          <table id="taskTable" class="table" aria-label="Tasks table">
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Title</th>
+                <th>Assignee</th>
+                <th>Room</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th style="width:220px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="taskTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Task modal -->
+  <div class="modal" id="taskModal" style="display:none">
+    <div class="stage" style="max-width:640px;padding:20px">
+      <div class="card-head">
+        <h3 id="taskModalTitle" style="margin:0;color:#0e1726">New Task</h3>
+        <button id="closeTaskModal" class="icon-btn">✕</button>
+      </div>
+
+      <div style="margin-top:12px">
+        <label>Title
+          <input id="taskTitle" class="input" placeholder="e.g. Room 102 — Quick Clean" />
+        </label>
+
+        <label>Assignee
+          <select id="taskAssignee" class="select">
+            <option value="">(Unassigned)</option>
+          </select>
+        </label>
+
+        <label>Type
+          <select id="taskType" class="select">
+            <!-- populated by tasks.js -->
+          </select>
+        </label>
+
+        <label>Room (optional)
+          <input id="taskRoom" class="input" placeholder="101" />
+        </label>
+
+        <label>Status
+          <select id="taskStatus" class="select">
+            <option>Pending</option>
+            <option>In Progress</option>
+            <option>Completed</option>
+          </select>
+        </label>
+
+        <label>Notes (optional)
+          <textarea id="taskNotes" class="input" style="min-height:80px"></textarea>
+        </label>
+      </div>
+
+      <div class="card-head" style="margin-top:12px">
+        <span class="muted">Tasks assigned here will appear in staff pages.</span>
+        <div>
+          <button id="cancelTask" class="btn staff">Cancel</button>
+          <button id="saveTask" class="btn">Save Task</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="nav.js"></script>
+  <script src="tasks.js" defer></script>
+  <script src="logout.js"></script>
+</body>
+</html>

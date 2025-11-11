@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Housekeeping — Sign In / Register</title>
+<style>
+  :root{
+    --bg:#0b1116;--side:#0e141a;--panel:#111922;--line:rgba(255,255,255,.08);
+    --ink:#e9f1f8;--mut:#a6b2bf;--brand:#2b74ff;--brand2:#1a59e6;--danger:#ef4444;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui}
+  .shell{min-height:100%;display:grid;place-items:center;padding:24px}
+
+  /* One big box (card) with image left + forms right */
+  .card{width:100%;max-width:980px;background:var(--panel);border:1px solid var(--line);
+        border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+  .grid{display:grid;grid-template-columns:360px 1fr;min-height:520px}
+  .left{
+    background:#0f1720;border-right:1px solid var(--line);display:grid;place-items:center;padding:16px
+  }
+  .left img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+  .right{padding:18px}
+
+  /* tabs + forms */
+  .tabs{display:flex;border-bottom:1px solid var(--line);gap:6px}
+  .tab{flex:1;text-align:center;padding:12px;font-weight:800;cursor:pointer;border-radius:10px 10px 0 0}
+  .tab.active{background:rgba(255,255,255,.06)}
+  .body{padding-top:16px}
+  .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  .row.full{grid-template-columns:1fr}
+  label{font-weight:700;font-size:13px}
+  .input,.select{
+    width:100%;padding:10px 12px;border-radius:10px;background:#0f1720;color:var(--ink);
+    border:1px solid var(--line);margin-top:6px
+  }
+  .btn{border:0;border-radius:10px;padding:12px 14px;font-weight:800;color:#fff;background:linear-gradient(180deg,var(--brand),var(--brand2));cursor:pointer}
+  .btn.ghost{background:#0f1720;color:#dfe7f1;border:1px solid var(--line)}
+  .mut{color:var(--mut);font-size:12px}
+  .err{color:#ffb7b7;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);padding:8px 10px;border-radius:10px;margin-bottom:10px;display:none}
+  .ok{color:#8ef1cd;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);padding:8px 10px;border-radius:10px;margin-bottom:10px;display:none}
+  .inline{display:flex;align-items:center;gap:8px}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+  @media (max-width:920px){ .grid{grid-template-columns:1fr} .left{display:none} }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="card">
+    <div class="grid">
+      <!-- Left image -->
+      <div class="left">
+        <img src="cleaning.png" alt="Housekeeping Illustration">
+      </div>
+
+      <!-- Right: tabs + forms -->
+      <div class="right">
+        <div class="tabs">
+          <div id="tabSign" class="tab active">Sign In</div>
+          <div id="tabReg" class="tab">Register</div>
+        </div>
+
+        <div class="body">
+          <!-- Alerts -->
+          <div id="alertErr" class="err"></div>
+          <div id="alertOk" class="ok"></div>
+
+          <!-- SIGN IN -->
+          <form id="formSign" autocomplete="off">
+            <div class="row full">
+              <label>Email
+                <input id="signEmail" class="input" type="email" placeholder="you@hotel.com" required>
+              </label>
+            </div>
+            <div class="row full">
+              <label>Password
+                <div class="inline">
+                  <input id="signPass" class="input" type="password" placeholder="••••••••" required>
+                  <button type="button" class="btn ghost" id="toggleSign">Show</button>
+                </div>
+              </label>
+            </div>
+            <div class="foot">
+              <span class="mut">Only registered emails can sign in.</span>
+              <button class="btn" type="submit">Sign In</button>
+            </div>
+          </form>
+
+          <!-- REGISTER -->
+          <form id="formReg" style="display:none" autocomplete="off">
+            <div class="row">
+              <label>Email
+                <input id="regEmail" class="input" type="email" placeholder="you@hotel.com" required>
+              </label>
+
+              <label>Role / Department
+                <select id="roleSelect" class="select" required>
+                  <option value="">— Select role —</option>
+                  <option>Room Cleaning</option>
+                  <option>Floor Cleaning</option>
+                  <option>Laundry</option>
+                  <option>Food Service</option>
+                  <option>Maintenance</option>
+                  <option>Gardener</option>
+                  <option>Storekeeping</option>
+                  <option>Night Shift</option>
+                  <option>Manager</option>
+                  <option>Admin</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="row full">
+              <label>New Password
+                <div class="inline">
+                  <input id="regPass" class="input" type="password" minlength="6" placeholder="min 6 characters" required>
+                  <button type="button" class="btn ghost" id="toggleReg1">Show</button>
+                </div>
+              </label>
+            </div>
+
+            <div class="row full">
+              <label>Confirm Password
+                <div class="inline">
+                  <input id="regPass2" class="input" type="password" minlength="6" placeholder="repeat password" required>
+                  <button type="button" class="btn ghost" id="toggleReg2">Show</button>
+                </div>
+              </label>
+            </div>
+
+            <div class="foot">
+              <span class="mut">Saved to this device only.</span>
+              <button class="btn" type="submit">Create Account</button>
+            </div>
+          </form>
+
+          <div class="mut" style="margin-top:8px">Tip: You can add staff later inside the app; sign-in is email-based.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (q) => document.querySelector(q);
+  const LS = { get(k, fb){ try{ return JSON.parse(localStorage.getItem(k)) ?? fb; }catch{ return fb; } },
+               set(k, v){ localStorage.setItem(k, JSON.stringify(v)); } };
+
+  const KEY_USERS = "hk_users_v1";   // [{email,role,passHash,createdAt}]
+
+  const alertErr = $("#alertErr"), alertOk = $("#alertOk");
+  function showErr(m){ alertOk.style.display="none"; alertErr.textContent=m; alertErr.style.display="block"; }
+  function showOk(m){ alertErr.style.display="none"; alertOk.textContent=m; alertOk.style.display="block"; }
+  function clearAlerts(){ alertErr.style.display="none"; alertOk.style.display="none"; }
+
+  // Tabs
+  $("#tabSign").onclick = ()=>switchTab("sign");
+  $("#tabReg").onclick  = ()=>switchTab("reg");
+  function switchTab(w){ clearAlerts(); const s = w==="sign";
+    $("#tabSign").classList.toggle("active",s); $("#tabReg").classList.toggle("active",!s);
+    $("#formSign").style.display = s?"block":"none"; $("#formReg").style.display = s?"none":"block";
+  }
+
+  // Password toggles
+  $("#toggleSign").onclick = ()=>togglePw("#signPass","#toggleSign");
+  $("#toggleReg1").onclick = ()=>togglePw("#regPass","#toggleReg1");
+  $("#toggleReg2").onclick = ()=>togglePw("#regPass2","#toggleReg2");
+  function togglePw(inputSel, btnSel){
+    const el=$(inputSel), b=$(btnSel); const show = el.type==="password";
+    el.type = show?"text":"password"; b.textContent = show?"Hide":"Show";
+  }
+
+  // SHA-256 hashing
+  async function sha256(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+
+  // ---- Role → page route map ----
+  function routeForRole(roleRaw){
+    const role = String(roleRaw || "").toLowerCase();
+    const map = {
+      "admin":"admin.html",
+      "manager":"admin.html",
+      "room cleaning":"room-cleaning.html",
+      "floor cleaning":"floor-cleaning.html",
+      "laundry":"laundry.html",
+      "food service":"food-service.html",
+      "maintenance":"maintenance.html",
+      "gardener":"gardener.html",
+      "storekeeping":"storekeeping.html",
+      "night shift":"night-shift.html"
+    };
+    return map[role] || "admin.html"; // fallback
+  }
+
+  // ---- Register ----
+  $("#formReg").addEventListener("submit", async (e)=>{
+    e.preventDefault(); clearAlerts();
+    const email = $("#regEmail").value.trim().toLowerCase();
+    const role  = ($("#roleSelect").value || "").trim();
+    const pass  = $("#regPass").value;
+    const pass2 = $("#regPass2").value;
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) return showErr("Enter a valid email.");
+    if (!role) return showErr("Please select a role/department.");
+    if (pass.length < 6) return showErr("Password must be at least 6 characters.");
+    if (pass !== pass2) return showErr("Passwords do not match.");
+
+    const users = LS.get(KEY_USERS, []);
+    if (users.some(u=>u.email===email)) return showErr("This email is already registered.");
+
+    const passHash = await sha256(pass);
+    users.push({ email, role, passHash, createdAt: Date.now() });
+    LS.set(KEY_USERS, users);
+
+    showOk("Account created. You can now sign in.");
+    $("#signEmail").value = email;
+    switchTab("sign");
+  });
+
+  // ---- Sign in (redirect by role) ----
+  $("#formSign").addEventListener("submit", async (e)=>{
+    e.preventDefault(); clearAlerts();
+    const email = $("#signEmail").value.trim().toLowerCase();
+    const pass  = $("#signPass").value;
+
+    const users = LS.get(KEY_USERS, []);
+    const u = users.find(x=>x.email===email);
+    if (!u) return showErr("This email is not registered. Please register first.");
+
+    const passHash = await sha256(pass);
+    if (u.passHash !== passHash) return showErr("Incorrect password.");
+
+    // Save session + redirect based on role
+    const route = routeForRole(u.role);
+    localStorage.setItem("hk_current_user", JSON.stringify({email:u.email, role:u.role, at:Date.now()}));
+    showOk("Signed in. Redirecting…");
+    setTimeout(()=>location.href = route, 500);
+  });
+})();
+</script>
+</body>
+</html>
