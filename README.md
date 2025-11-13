@@ -1,31 +1,42 @@
 
-| Frameworks/Libraries     | Flask/Django, Bootstrap (if used) |
-| Database                 | SQLite/MySQL (configurable) |
-| Version Control          | Git & GitHub           |
+# Housekeeping Management System
+
+## Overview
+The Housekeeping Management System is designed to streamline daily housekeeping operations by helping admins, managers, and staff track tasks, manage issues, and maintain cleanliness records efficiently. This project provides an organized workflow for assigning tasks, maintaining staff information, and improving communication between housekeeping teams.
 
 ---
 
-## 📁 Project Structure
-housekeeping_management_system/    
-│     
-├── main.py # Entry point     
-├── models/ # Database models     
-├── static/ # CSS, JS, images    
-├── templates/ # HTML views    
-├── utils/ # Helper utilities     
-└── README.md # Project docs     
-
+## Tech Stack
+| Category                 | Tools/Technologies      |
+|-------------------------|--------------------------|
+| Backend Framework       | Flask / Django           |
+| Frontend                | HTML, CSS, Bootstrap     |
+| Database                | SQLite / MySQL           |
+| Version Control         | Git & GitHub             |
+| IDE/Editor              | VS Code / PyCharm        |
 
 ---
 
-## 🚀 Getting Started
+## Project Structure
+housekeeping_management_system/  
+│  
+├── main.py               # Application entry point  
+├── models/               # Database models  
+├── static/               # CSS, JS, images  
+├── templates/            # HTML views  
+├── utils/                # Helper utilities  
+└── README.md             # Project documentation  
+
+---
+
+## Getting Started
 
 ### Prerequisites
-
-- Python 3.x
+- Python 3.x  
 - pip (Python package manager)
 
-### Installation
+### Installation Steps
+
 git clone https://github.com/manasa1864/     housekeeping_management_system.git    
 cd housekeeping_management_system     
 pip install -r requirements.txt     
